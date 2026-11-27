@@ -52,7 +52,7 @@ async function holeWetter(lat, lon) {
     "https://api.open-meteo.com/v1/forecast" +
     `?latitude=${lat}&longitude=${lon}` +
     "&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m" +
-    "&daily=weather_code,temperature_2m_max,temperature_2m_min" +
+    "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max" +
     "&forecast_days=7" +
     "&timezone=auto";
 
@@ -80,6 +80,7 @@ function baueVorhersage(daily) {
         <span class="tag-symbol" title="${text}">${symbol}</span>
         <span class="min">${Math.round(daily.temperature_2m_min[i])}°</span>
         <span class="max">${Math.round(daily.temperature_2m_max[i])}°</span>
+        <span>regen: ${daily.precipitation_probability_max[i]}%</span>
       </li>
     `;
   });
