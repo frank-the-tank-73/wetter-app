@@ -99,6 +99,47 @@ button:hover {
   line-height: 1.8;
 }
 
+/* 7-Tage-Vorhersage */
+#weatherInfo h3 {
+  margin: 1.5rem 0 0.5rem;
+  text-align: left;
+  font-size: 1rem;
+  color: #55657a;
+}
+
+.vorhersage {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.vorhersage li {
+  display: grid;
+  grid-template-columns: 4rem 2.5rem 1fr 3rem;
+  align-items: center;
+  padding: 0.4rem 0;
+  border-top: 1px solid #e6ebf1;
+}
+
+.vorhersage .tag {
+  text-align: left;
+  font-weight: 600;
+}
+
+.vorhersage .tag-symbol {
+  font-size: 1.4rem;
+}
+
+.vorhersage .min {
+  text-align: right;
+  color: #8796a8;
+}
+
+.vorhersage .max {
+  text-align: right;
+  font-weight: 600;
+}
+
 .fehler {
   color: #c0392b;
   margin: 0;

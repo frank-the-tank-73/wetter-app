@@ -46,23 +46,50 @@ async function findeStadt(name) {
   return daten.results[0]; // enthält name, country, latitude, longitude, ...
 }
 
-// 2. Koordinaten -> aktuelles Wetter
+// 2. Koordinaten -> aktuelles Wetter + 7-Tage-Vorhersage
 async function holeWetter(lat, lon) {
   const url =
     "https://api.open-meteo.com/v1/forecast" +
     `?latitude=${lat}&longitude=${lon}` +
     "&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m" +
+    "&daily=weather_code,temperature_2m_max,temperature_2m_min" +
+    "&forecast_days=7" +
     "&timezone=auto";
 
   const antwort = await fetch(url);
   if (!antwort.ok) throw new Error("Wetterabfrage fehlgeschlagen (HTTP " + antwort.status + ")");
 
-  const daten = await antwort.json();
-  return daten.current;
+  return await antwort.json(); // enthält "current" und "daily"
+}
+
+// Datum "2026-11-28" -> "Heute" bzw. Wochentag "Sa."
+function wochentag(datum, index) {
+  if (index === 0) return "Heute";
+  // "T00:00" sorgt dafür, dass das Datum in lokaler Zeit gelesen wird
+  return new Date(datum + "T00:00").toLocaleDateString("de-DE", { weekday: "short" });
+}
+
+// 7-Tage-Vorhersage als HTML-Liste bauen
+function baueVorhersage(daily) {
+  // daily enthält parallele Arrays: daily.time[i], daily.temperature_2m_max[i], ...
+  const zeilen = daily.time.map((datum, i) => {
+    const [text, symbol] = WETTERCODES[daily.weather_code[i]] ?? ["Unbekannt", "❔"];
+    return `
+      <li>
+        <span class="tag">${wochentag(datum, i)}</span>
+        <span class="tag-symbol" title="${text}">${symbol}</span>
+        <span class="min">${Math.round(daily.temperature_2m_min[i])}°</span>
+        <span class="max">${Math.round(daily.temperature_2m_max[i])}°</span>
+      </li>
+    `;
+  });
+
+  return `<ul class="vorhersage">${zeilen.join("")}</ul>`;
 }
 
 // 3. Ergebnis ins HTML schreiben
-function zeigeWetter(ort, wetter) {
+function zeigeWetter(ort, daten) {
+  const wetter = daten.current;
   const [text, symbol] = WETTERCODES[wetter.weather_code] ?? ["Unbekannt", "❔"];
 
   output.innerHTML = `
@@ -75,6 +102,8 @@ function zeigeWetter(ort, wetter) {
       <li>Luftfeuchtigkeit: ${wetter.relative_humidity_2m} %</li>
       <li>Wind: ${Math.round(wetter.wind_speed_10m)} km/h</li>
     </ul>
+    <h3>Nächste 7 Tage</h3>
+    ${baueVorhersage(daten.daily)}
   `;
 }
 
@@ -89,8 +118,8 @@ form.addEventListener("submit", async (event) => {
 
   try {
     const ort = await findeStadt(stadt);
-    const wetter = await holeWetter(ort.latitude, ort.longitude);
-    zeigeWetter(ort, wetter);
+    const daten = await holeWetter(ort.latitude, ort.longitude);
+    zeigeWetter(ort, daten);
   } catch (fehler) {
     output.innerHTML = `<p class="fehler">${fehler.message}</p>`;
   }
