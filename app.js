@@ -80,7 +80,7 @@ function baueVorhersage(daily) {
         <span class="tag-symbol" title="${text}">${symbol}</span>
         <span class="min">${Math.round(daily.temperature_2m_min[i])}°</span>
         <span class="max">${Math.round(daily.temperature_2m_max[i])}°</span>
-        <span>regen: ${daily.precipitation_probability_max[i]}%</span>
+        <span class="regen">${daily.precipitation_probability_max[i]}%</span>
       </li>
     `;
   });
