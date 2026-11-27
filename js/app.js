@@ -6,11 +6,35 @@ const form = document.getElementById("cityForm");
 const input = document.getElementById("cityInput");
 const standortButton = document.getElementById("standortButton");
 
-// Wetter für einen Ort laden und anzeigen
+// Schlüssel, unter dem der letzte Ort im Browser gespeichert wird
+const SPEICHER_SCHLUESSEL = "wetterapp.letzterOrt";
+
+// localStorage speichert nur Texte, daher wandeln wir das Objekt in JSON um.
+// try/catch, weil localStorage z. B. im privaten Modus gesperrt sein kann.
+function merkeOrt(ort) {
+  const { name, country, latitude, longitude } = ort;
+  try {
+    localStorage.setItem(SPEICHER_SCHLUESSEL, JSON.stringify({ name, country, latitude, longitude }));
+  } catch {
+    // Nicht schlimm: Die App funktioniert auch ohne Speichern.
+  }
+}
+
+function leseGemerktenOrt() {
+  try {
+    const text = localStorage.getItem(SPEICHER_SCHLUESSEL);
+    return text ? JSON.parse(text) : null;
+  } catch {
+    return null;
+  }
+}
+
+// Wetter für einen Ort laden, anzeigen und den Ort merken
 async function ladeWetterFuer(ort) {
   zeigeLaden();
   const daten = await holeWetter(ort.latitude, ort.longitude);
   zeigeWetter(ort, daten);
+  merkeOrt(ort);
 }
 
 // Ablauf beim Absenden des Formulars (Button-Klick oder Enter)
@@ -64,3 +88,10 @@ standortButton.addEventListener("click", async () => {
     zeigeFehler(fehler.message);
   }
 });
+
+// Beim Start: Gibt es einen gemerkten Ort, zeigen wir dessen Wetter gleich an.
+const gemerkterOrt = leseGemerktenOrt();
+if (gemerkterOrt) {
+  if (gemerkterOrt.name !== "Aktueller Standort") input.value = gemerkterOrt.name;
+  ladeWetterFuer(gemerkterOrt).catch((fehler) => zeigeFehler(fehler.message));
+}
