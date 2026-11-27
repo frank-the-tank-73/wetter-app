@@ -52,6 +52,10 @@ button {
   cursor: pointer;
 }
 
+#standortButton {
+  padding: 0.7rem 0.8rem;
+}
+
 button:hover {
   background: #33445a;
 }
