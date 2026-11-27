@@ -36,6 +36,7 @@ h1 {
 
 #cityInput {
   flex: 1;
+  min-width: 0;
   padding: 0.7rem;
   font-size: 1rem;
   border: none;
@@ -43,6 +44,7 @@ h1 {
 }
 
 button {
+  white-space: nowrap;
   padding: 0.7rem 1rem;
   font-size: 1rem;
   border: none;
@@ -50,6 +52,10 @@ button {
   background: #1d2733;
   color: white;
   cursor: pointer;
+}
+
+#standortButton {
+  padding: 0.7rem 0.8rem;
 }
 
 button:hover {
